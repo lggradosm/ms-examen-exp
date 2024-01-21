@@ -11,10 +11,10 @@ import org.springframework.stereotype.Component;
 @Setter
 @Component
 public class Util {
-    public static String convertToJsonEntity(ResponseSunat responseSunat) {
+    public static String convertToJsonEntity(EnterprisesEntity  enterprisesEntity) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
-            return objectMapper.writeValueAsString(responseSunat);
+            return objectMapper.writeValueAsString(enterprisesEntity);
         } catch (Exception e) {
             e.printStackTrace();
             return null;

@@ -1,5 +1,6 @@
 package com.codigo.msexamenexp.aggregates.response;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -9,6 +10,7 @@ import java.io.Serializable;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 public class ResponseSunat implements Serializable {
     private String razonSocial;
     private String tipoDocumento;

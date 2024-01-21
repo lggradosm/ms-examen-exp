@@ -17,7 +17,7 @@
 		<java.version>17</java.version>
 		<spring-cloud.version>2022.0.4</spring-cloud.version>
 		<sonar.host.url>http://localhost:9000/</sonar.host.url>
-		<sonar.token>sqp_2cfcb4592c12b434e3edd17d3ac297f9df30caa6</sonar.token>
+		<sonar.token>sqp_067b7c653b6c3ab433dbaea68847fb5f59aaff77</sonar.token>
 		<sonar.projectKey>exa2</sonar.projectKey>
 		<sonar.projectName>exa2</sonar.projectName>
 
@@ -69,6 +69,23 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-redis</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-core</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-api</artifactId>
+			<scope>test</scope>
+			<version>5.7.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-engine</artifactId>
+			<version>5.7.0</version>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 	<dependencyManagement>

@@ -28,7 +28,6 @@ public class EnterprisesServiceImpl implements EnterprisesService {
     private final EnterprisesValidations enterprisesValidations;
     private final DocumentsTypeRepository typeRepository;
     private final SunatClient sunatClient;
-    private final Util util;
 
     private final RedisService redisService;
 
@@ -37,12 +36,11 @@ public class EnterprisesServiceImpl implements EnterprisesService {
     @Value("${time.expiration.sunat.info}")
     private String timeExpirationSunatInfo;
 
-    public EnterprisesServiceImpl(EnterprisesRepository enterprisesRepository, EnterprisesValidations enterprisesValidations, DocumentsTypeRepository typeRepository, SunatClient sunatClient, Util util, RedisService redisService) {
+    public EnterprisesServiceImpl(EnterprisesRepository enterprisesRepository, EnterprisesValidations enterprisesValidations, DocumentsTypeRepository typeRepository, SunatClient sunatClient, RedisService redisService) {
         this.enterprisesRepository = enterprisesRepository;
         this.enterprisesValidations = enterprisesValidations;
         this.typeRepository = typeRepository;
         this.sunatClient = sunatClient;
-        this.util = util;
         this.redisService = redisService;
     }
     @Override
@@ -71,9 +69,16 @@ public class EnterprisesServiceImpl implements EnterprisesService {
 
     @Override
     public ResponseBase findOneEnterprise(String doc) {
-        EnterprisesEntity enterprisesEntity = enterprisesRepository.findByNumDocument(doc);
+        String redisCache  = redisService.getValueByKey(Constants.REDIS_KEY_INFO_SUNAT+doc);
+        EnterprisesEntity  enterprisesEntity= new EnterprisesEntity();
+        if(redisCache != null){
+            enterprisesEntity = Util.convertFromJson(redisCache,EnterprisesEntity.class);
+        }else{
+            enterprisesEntity = enterprisesRepository.findByNumDocument(doc);
+            String redisData = Util.convertToJsonEntity(enterprisesEntity);
+            redisService.saveKeyValue(Constants.REDIS_KEY_INFO_SUNAT+doc,redisData,Integer.valueOf(timeExpirationSunatInfo));
+        }
         return new ResponseBase(Constants.CODE_SUCCESS,Constants.MESS_SUCCESS, Optional.of(enterprisesEntity));
-
     }
 
     @Override
@@ -172,20 +177,20 @@ public class EnterprisesServiceImpl implements EnterprisesService {
         return timestamp;
     }
     public ResponseSunat getExecutionSunat(String numero){
-        String redisCache = redisService.getValueByKey(Constants.REDIS_KEY_INFO_SUNAT+numero);
-        if(redisCache!=null){
-            ResponseSunat sunat = Util.convertFromJson(redisCache, ResponseSunat.class);
-            System.out.println("cache data");
-            return sunat;
-        }else{
-            String authorization = "Bearer" + tokenSunat;
-            System.out.println("api data");
-
-            ResponseSunat responseSunat = sunatClient.getInfoSunat(numero, authorization);
-            String redisData = Util.convertToJsonEntity(responseSunat);
-            redisService.saveKeyValue(Constants.REDIS_KEY_INFO_SUNAT+numero,redisData,Integer.valueOf(timeExpirationSunatInfo));
-            return responseSunat;
-        }
+        String authorization = "Bearer" + tokenSunat;
+        ResponseSunat responseSunat = sunatClient.getInfoSunat(numero, authorization);
+        return responseSunat;
+//        String redisCache = redisService.getValueByKey(Constants.REDIS_KEY_INFO_SUNAT+numero);
+//        if(redisCache!=null){
+//            ResponseSunat sunat = Util.convertFromJson(redisCache, ResponseSunat.class);
+//            System.out.println("cache data");
+//            return sunat;
+//        }else{
+//
+//            String redisData = Util.convertToJsonEntity(responseSunat);
+//            redisService.saveKeyValue(Constants.REDIS_KEY_INFO_SUNAT+numero,redisData,Integer.valueOf(timeExpirationSunatInfo));
+//            return responseSunat;
+//        }
 
     }
 }
